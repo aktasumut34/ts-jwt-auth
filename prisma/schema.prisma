@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  name           String
+  email          String
+  password       String
+  roleId         Int
+  status         Int            @default(0)
+  Tokens         Token[]
+  Addresses      Address[]
+  Phones         Phone[]
+  Role           Role            @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime?       @default(now())
+}
+
+model Role {
+  id        Int       @id @default(autoincrement())
+  name      String
+  users     User[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+
+model Address {
+  id        Int       @id @default(autoincrement())
+  name      String
+  country   String
+  street    String
+  city      String
+  state     String
+  zip       String
+  user_id   Int
+  User      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+model Phone {
+  id        Int       @id @default(autoincrement())
+  number    String    @unique
+  user_id   Int
+  faCode    String
+  verified  Boolean   @default(false)
+  User      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now())
+}
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  token     String    @db.Text()
+  user_id   Int
+  User      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now())
+}
